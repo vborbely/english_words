@@ -7,7 +7,10 @@ class AppBarColorize extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [Colors.purple, Colors.teal])
+        gradient: LinearGradient(
+          colors: [Colors.purple, Colors.teal],
+          transform: GradientRotation(0),
+        ),
       ),
     );
   }
