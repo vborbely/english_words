@@ -11,14 +11,24 @@ class RandomWordsScreen extends StatefulWidget {
 }
 
 class RandomWordsScreenState extends State<RandomWordsScreen> {
+  List _suggestions = repository.getAllSuggestions();
+
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
+    return Scaffold(
+      appBar: AppBar(
         flexibleSpace: AppBarColorize(),
-        title: new Text('Startup Name Generator'),
+        title: Column(
+          children: [
+            Text('Startup Name Generator'),
+            Text(
+              '${_suggestions.length} items',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w200),
+            ),
+          ],
+        ),
         actions: <Widget>[
-          new IconButton(
+          IconButton(
             icon: const Icon(Icons.list),
             onPressed: _pushSaved,
           )
@@ -29,51 +39,58 @@ class RandomWordsScreenState extends State<RandomWordsScreen> {
   }
 
   Widget _buildSuggestion() {
-    final suggestions = repository.getAllSuggestions();
-
-    return ListView.builder(
-    // return GridView.builder(
-    //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-      padding: const EdgeInsets.all(16.0),
-      itemBuilder: (BuildContext _context, int i) {
-        if (i.isOdd) {
-          return new Divider( endIndent: 50, thickness: 0.8,);
-        }
-        final int index = i ~/ 2;
-        // final int index = i;
-
-        if (index >= suggestions.length) {
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollInfo) {
+        if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent) {
           repository.generateSuggestions();
+          setState(() {});
         }
-        return _buildRow(suggestions[index]);
+        return true;
       },
+      child: ListView.builder(
+        itemCount: _suggestions.length,
+        // GridView.builder(
+        //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+        padding: const EdgeInsets.all(16.0),
+        itemBuilder: (BuildContext _context, int index) {
+          return _buildRow(_suggestions[index]);
+        },
+      ),
     );
   }
 
   Widget _buildRow(WordPair pair) {
     final bool _alreadySaved = repository.has(pair);
-    return new ListTile(
-      title: new Text(
-        pair.asPascalCase,
-        style: _alreadySaved ? Theme.of(context).textTheme.bodyText2 : Theme.of(context).textTheme.bodyText1,
-      ),
-      trailing: new Icon(
-        _alreadySaved ? Icons.star : Icons.star_border,
-        color: _alreadySaved ? Colors.orangeAccent : null,
-      ),
-      onTap: () {
-        setState(() {
-          if (_alreadySaved) {
-            repository.remove(pair);
-          } else {
-            repository.save(pair);
-          }
-        });
-      },
+    return Column(
+      children: [
+        ListTile(
+          title: Text(
+            pair.asPascalCase,
+            style: _alreadySaved ? Theme.of(context).textTheme.bodyText2 : Theme.of(context).textTheme.bodyText1,
+          ),
+          trailing: Icon(
+            _alreadySaved ? Icons.star : Icons.star_border,
+            color: _alreadySaved ? Colors.orangeAccent : null,
+          ),
+          onTap: () {
+            setState(() {
+              if (_alreadySaved) {
+                repository.remove(pair);
+              } else {
+                repository.save(pair);
+              }
+            });
+          },
+        ),
+        Divider(
+          endIndent: 50,
+          thickness: 0.8,
+        )
+      ],
     );
   }
 
   void _pushSaved() {
-    Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) => FavouritesScreen()));
+    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => FavouritesScreen()));
   }
 }

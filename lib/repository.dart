@@ -8,6 +8,10 @@ class MyRepository {
   final List<WordPair> _suggestions = <WordPair>[];
   final Set<WordPair> _saved = Set<WordPair>();
 
+  MyRepository(){
+    generateSuggestions();
+  }
+
   void generateSuggestions(){
     _suggestions.addAll(generateWordPairs().take(10));
   }
