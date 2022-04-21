@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      title: 'Welcome to Flutter',
       home: RandomWordsScreen(),
     );
   }

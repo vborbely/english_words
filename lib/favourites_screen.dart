@@ -9,18 +9,19 @@ class FavouritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Iterable<ListTile> tiles = repository.getSaved().map((WordPair pair) {
-      return ListTile(
-        title: Text(
-          pair.asPascalCase,
-            style: Theme.of(context).textTheme.bodyText2
-        ),
-      );
-    });
+    final List<ListTile> tiles = repository.getSaved().map(
+      (WordPair pair) {
+        return ListTile(
+          title: Text(pair.asPascalCase, style: Theme.of(context).textTheme.bodyText2),
+        );
+      },
+    ).toList();
+
     final List<Widget> divided = ListTile.divideTiles(
       context: context,
       tiles: tiles,
     ).toList();
+
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
